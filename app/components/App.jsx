@@ -4,13 +4,52 @@ import IconButton from 'material-ui/IconButton';
 import NavigationMenu from 'material-ui/svg-icons/navigation/menu';
 import Paper from 'material-ui/Paper';
 import Snackbar from 'material-ui/Snackbar';
+import geolib from 'geolib';
 
 const App = React.createClass({
   getInitialState() {
     return {
       loginSnackbarOpen: false,
-      userType: null
+      checkedIn: false,
+      userType: null,
+      timeoutId: null,
+      coords: null
     };
+  },
+
+  workerCheckIn() {
+
+    if (!this.state.checkedIn) {
+      this.state.timeoutID = window.setInterval(this.updateLocation, 10000);
+      this.setState({ checkedIn: true });
+    }
+    else {
+      this.setState({ checkedIn: false });
+      window.clearInterval(this.state.timeoutID);
+    }
+
+  },
+
+
+  updateLocation() {
+    if (!navigator.geolocation) {
+      return console.log('Geolocation is not supported by your browser.');
+    }
+
+    const success = (position) => {
+      const { latitude, longitude } = position.coords;
+      const nextCoords = Object.assign({}, { latitude, longitude });
+
+      const distance = geolib.getDistance(this.state.coords || nextCoords, nextCoords);
+      this.setState({ coords: nextCoords });
+      console.log('change in distance is ', distance);
+    };
+
+    const failure = () => {
+      console.log('Could not obtain your location.');
+    };
+
+    navigator.geolocation.getCurrentPosition(success, failure);
   },
 
   render() {
@@ -28,7 +67,7 @@ const App = React.createClass({
     };
 
     const stylePaper = {
-      backgroundColor: '#e5f3e9',
+      backgroundColor: '#62c559',
       marginBottom: '10px'
     };
 
@@ -44,18 +83,9 @@ const App = React.createClass({
     };
 
     const styleTitle = {
-      fontSize: '35px',
-      color: '#ff7f66',
+      fontSize: '25px',
+      color: '#c55962',
       fontFamily: 'Varela Round'
-    };
-
-    const styleTagline = {
-      fontSize: '13px',
-      fontWeight: '400',
-      marginTop: '0px',
-      marginLeft: '0px',
-      color: 'black',
-      fontFamily: 'Roboto'
     };
 
     const styleImage = {
@@ -77,9 +107,7 @@ const App = React.createClass({
         <div style={styleContainer}>
 
           <div style={styleTitle}>
-            smokator
-
-            <h1 style={styleTagline}>Connecting drunk smokers since 1776</h1>
+            Agricultural <br/> Resource <br/> Manager
           </div>
 
           <IconButton
@@ -87,7 +115,7 @@ const App = React.createClass({
             onTouchTap={this.handleToggle}
             style={styleMenu.style}
           >
-            <NavigationMenu color={'#ff7f66'} />
+            <NavigationMenu color={'#c55962'} />
           </IconButton>
 
           {/* <Menu
@@ -107,7 +135,8 @@ const App = React.createClass({
       />
 
       {React.cloneElement(this.props.children, {
-        alerts: 0
+        alerts: 0,
+        workerCheckIn: this.workerCheckIn
       })}
     </div>;
   }

@@ -3,6 +3,10 @@ import RaisedButton from 'material-ui/RaisedButton';
 import React from 'react';
 
 const MainButtons = React.createClass({
+  handleWorkerCheckIn() {
+    this.props.workerCheckIn();
+  },
+
   render() {
     const flexContainer = {
       display: 'flex',
@@ -22,18 +26,15 @@ const MainButtons = React.createClass({
 
     return <div style={flexContainer}>
 
-      <Link
-        style={{ textDecoration: 'none' }}
-        to="/login"
-      >
+
         <RaisedButton
-          label="Login"
+          label="Worker"
           primary={true} style={styleButton}
+          onTouchTap={this.handleWorkerCheckIn}
         />
-      </Link>
 
       <Link style={{ textDecoration: 'none' }} to="/register">
-        <RaisedButton label="Register" primary={true} style={styleButton} />
+        <RaisedButton label="Leader" primary={true} style={styleButton} />
       </Link>
     </div>;
   }
